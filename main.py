@@ -4,6 +4,7 @@
         # -1 = barcos
         # 15 = luffy
         # 99 = one_piece
+        # 1000 = one_piece foi encontrado
         
     # Matriz_valores:
         # 700.0 = barcos
@@ -99,7 +100,7 @@ def movimentacaoPersonagem(matriz, fila_posicoes, fila_valores, posicaoX, posica
         fila_valores.append(aux)
 
     # Esquerda
-    if(fila_posicoes[2][0] == -1):
+    if(fila_posicoes[2][1] == -1):
         aux = 999.9
         fila_valores.append(aux)
     else:
@@ -116,10 +117,11 @@ def movimentacaoPersonagem(matriz, fila_posicoes, fila_valores, posicaoX, posica
     
     return fila_valores
 
-def printaTerminal(personagem_posicaoX, personagem_posicaoY, tesouro_posicaoX, tesouro_posicaoY,
+def printaTerminal(iteracao, personagem_posicaoX, personagem_posicaoY, tesouro_posicaoX, tesouro_posicaoY,
                    fila_valores, fila_posicoes, matriz, matriz_cenario):
     
-    print('Perosnagem: ', personagem_posicaoX, personagem_posicaoY)
+    print('Iteração: ', iteracao)
+    print('Personagem: ', personagem_posicaoX, personagem_posicaoY)
     print('Tesouro: ' , tesouro_posicaoX, tesouro_posicaoY)
     print('Fila com valores: ', fila_valores)
     print('Fila com as posições: ', fila_posicoes)
@@ -163,6 +165,7 @@ def escreveArquivo(x, y, matriz, matriz_cenario, caminho, personagemX, personage
 if __name__ == '__main__':
 
     # Define o tamanho da matriz, podendo ser de várias formas
+    print("Busca do primeiro melhor, determine a matriz grid:\n")
     x = int(input("Determina o x da matriz: "))
     y = int(input("Determina o y da matriz: "))
 
@@ -187,14 +190,17 @@ if __name__ == '__main__':
         for j in range(y):
             matriz[i, j] = "{:.2f}" .format(calculaEstimativa(i, j))
     
+    matriz_cenario[personagem.posicaoX, personagem.posicaoY] = 15
+    matriz_cenario[tesouro.posicaoX, tesouro.posicaoY] = 99
+    
     # Adiciona os barcos nas posições dentro da matriz de estimativas
     for i in range(x):
         for j in range(y):
             if(matriz_cenario[i, j] == -1):
                 matriz[i, j] = 700.0
-    
-    matriz_cenario[personagem.posicaoX, personagem.posicaoY] = 15
-    matriz_cenario[tesouro.posicaoX, tesouro.posicaoY] = 99
+
+    # Variavel de controle apenas para ver qual interação está sendo feita
+    iteracao = 0
 
     # Inicia de fato o programa
     # Fila de posição do caminho
@@ -211,6 +217,7 @@ if __name__ == '__main__':
         exit() # Sai direto do programa
     else:
         while (luffy != one_piece):
+            iteracao = iteracao + 1
             
             # Pega a posição do personagem e o valor que custara está movimentação 
             posicaoPersonagem(fila_posicoes, personagem.posicaoX, personagem.posicaoY)
@@ -224,7 +231,7 @@ if __name__ == '__main__':
                 break
             
             # Primeiro print, aonde o luffy começara e aonde o one piece está
-            printaTerminal(personagem.posicaoX, personagem.posicaoY, tesouro.posicaoX, tesouro.posicaoY, fila_valores, fila_posicoes, matriz, matriz_cenario)
+            printaTerminal(iteracao, personagem.posicaoX, personagem.posicaoY, tesouro.posicaoX, tesouro.posicaoY, fila_valores, fila_posicoes, matriz, matriz_cenario)
             
             # Adiciona o caminho percorrido
             caminho.append(luffy)
@@ -240,17 +247,19 @@ if __name__ == '__main__':
             # Move o personagem para a nova posição
             matriz_cenario[personagem.posicaoX, personagem.posicaoY] = 15
             
-            # Mesmo print, mas agora com o personagem avançado na matriz
-            #printaTerminal(personagem.posicaoX, personagem.posicaoY, tesouro.posicaoX, tesouro.posicaoY, fila_valores, fila_posicoes, matriz, matriz_cenario)
-            
             # Zera as filas para não ter lixo no buffer
             fila_posicoes.clear()
             fila_valores.clear()
             
+            
     if(luffy == one_piece):
-        print("O luffy finalmente encontrou o One Piece, seu caminho foi esse: ", caminho)
-
+        # Adiciona um novo valor apenas se o one piece for encontrado, para diferenciar apenas
+        matriz_cenario[tesouro.posicaoX, tesouro.posicaoY] = 1000
+        
+        print("\n\nO luffy finalmente encontrou o One Piece, seu caminho foi esse: ", caminho)
+        
+        printaTerminal(iteracao, personagem.posicaoX, personagem.posicaoY, tesouro.posicaoX, tesouro.posicaoY, fila_valores, fila_posicoes, matriz, matriz_cenario)
+        
     escreveArquivo(x, y, matriz, matriz_cenario, caminho, personagem.posicaoX, personagem.posicaoY, tesouro.posicaoX, tesouro.posicaoY)
         
-
-            
+     
