@@ -1,3 +1,8 @@
+# Algoritmo da busca do primeiro melhor
+# Inteligencia Artificial - Professor Andre Luiz Brun
+# UNIOESTE - Universidade Estadual do Oeste do Paraná
+# Nomes: Gabriel Mazzuco, Rodrigo Brickmann, Guilherme Correia
+
 # Sumário:
     # Matriz_cenario:
         # 0  = caminho livre
@@ -17,16 +22,20 @@ import random
 import os
 import sys
 
+# Define o personagem, aleatorizando a sua posição dentro do grid
 class Luffy:
     def __init__(self, x, y):
         self.posicaoX = random.randint(0, x-1)
         self.posicaoY = random.randint(0, y-1)
-        
+
+# Define o tesouro, aleatorizando a sua posição dentro do grid        
 class OnePiece:
     def __init__(self, x, y):
         self.posicaoX = random.randint(0, x-1)
         self.posicaoY = random.randint(0, y-1)
-        
+       
+# Define os barcos, aleatorizando a sua posição dentro do grid, e dentro dela, terá a criação de
+# quantos navios terá, verificando a dificuldade estabelecida no algoritmo 
 class Navio:
     def __init__(self, x, y, matriz_cenario, dificuldade):
         for i in range(Navio.Barcos()):
@@ -51,7 +60,9 @@ class Navio:
             
         elif(dificuldade == 4):
             return 1
-    
+  
+# Usando a trigonometria, será criado a matriz estimativa, aonde o personagem verificara qual a melhor
+# posição que ele podera andar  
 def calculaEstimativa(posicaoX, posicaoY):
     if (matriz[posicaoX, posicaoY] == -1):
         return -1
@@ -61,7 +72,9 @@ def calculaEstimativa(posicaoX, posicaoY):
         medida3 = (pow(medida1, 2)) + (pow(medida2, 2))
         estimativa = math.sqrt(medida3)
         return estimativa
-    
+ 
+# Ordena os dois vetores com base no primeiro, já que apenas é possivel ordenar os valores, é estabelecido
+# um index que permitira ordenar a fila de posições. Com base na ordenação, o personagem fara o seu movimento   
 def ordena(fila_valores, fila_posicoes):
     #https://pt.stackoverflow.com/questions/507769/ordenar-duas-listas-com-base-na-ordem-da-primeira
     x = fila_valores
@@ -79,6 +92,7 @@ def ordena(fila_valores, fila_posicoes):
 
     return new_x, new_y
 
+# Define as posições possiveis que o personagem pode andar, salvando as posições de cima, baixo, esquerda e direta
 def posicaoPersonagem(fila_posicoes, posicaoX, posicaoY):
     aux = posicaoX - 1, posicaoY 
     fila_posicoes.append(aux) # Cima
@@ -94,6 +108,8 @@ def posicaoPersonagem(fila_posicoes, posicaoX, posicaoY):
 
     return fila_posicoes
 
+# Definira a fila de valores com base na matriz de valores, com a posição alcançada dentro da posicaoPersonagem()
+# dentro ocorrendo uma verificação se o personagem está na borda do void
 def movimentacaoPersonagem(matriz, fila_posicoes, fila_valores, posicaoX, posicaoY):
     # Cima
     if(fila_posicoes[0][0] == -1):
@@ -129,6 +145,8 @@ def movimentacaoPersonagem(matriz, fila_posicoes, fila_valores, posicaoX, posica
     
     return fila_valores           
 
+# Verificação se o personagem está preso, no caso se os valores estão muito descrepantes, impossibilitando do
+# personagem de andar para qualquer lado
 def verificaObstrucao(fila_valores):
     if((fila_valores[3] == 700.0) or (fila_valores[3] == 800.0) or (fila_valores[3] == 999.9)):
         if((fila_valores[2] == 700.0) or (fila_valores[2] == 800.0) or (fila_valores[2] == 999.9)):
@@ -137,13 +155,14 @@ def verificaObstrucao(fila_valores):
                     return True
     else:
         return False
-    
-def printaTerminal(iteracao, personagem_posicaoX, personagem_posicaoY, tesouro_posicaoX, tesouro_posicaoY,
-                   fila_valores, fila_posicoes, matriz, matriz_cenario):
+  
+# Função para printar as informações necessárias, a cada iteração que será feita  
+def printaTerminal(iteracao, luffy, one_piece, posicaoX, posicaoY, fila_valores, fila_posicoes, matriz, matriz_cenario):
     
     print('Iteração: ', iteracao)
-    print('Personagem: ', personagem_posicaoX, personagem_posicaoY)
-    print('Tesouro: ' , tesouro_posicaoX, tesouro_posicaoY)
+    print('Posição inicial do Personagem: ', luffy)
+    print('Posição agora do personagem: ', posicaoX, posicaoY)
+    print('Tesouro: ' , one_piece)
     print('Fila com valores: ', fila_valores)
     print('Fila com as posições: ', fila_posicoes)
     print('\n')
@@ -152,35 +171,6 @@ def printaTerminal(iteracao, personagem_posicaoX, personagem_posicaoY, tesouro_p
     print(matriz_cenario)
     print("--------------------------------------------------------------")
     print('\n')
-
-def escreveArquivo(x, y, matriz, matriz_cenario, caminho, personagemX, personagemY, tesouroX, tesouroY):
-    arquivo = open("resposta.txt", "w")
-    
-    # Posição do personagem/tesouro
-    arquivo.write("Posição do Personagem: "+ str(personagemX) + " " + str(personagemY) + "\n")
-    arquivo.write("Posição do Tesouro: "+ str(tesouroX) + " " + str(tesouroY) + "\n\n")
-    
-    # Matriz de cenario
-    arquivo.write("Matriz de Cenário: \n")
-    for i in range(x):
-        for j in range(y):
-            arquivo.write(str(matriz_cenario[i, j]))
-            arquivo.write(" ")
-        arquivo.write("\n")
-    
-    arquivo.write("\n\n")
-    
-    # Matriz de custo
-    arquivo.write("Matriz de Custo: \n")
-    for i in range(x):
-        for j in range(y):
-            arquivo.write(str(matriz[i, j]))
-            arquivo.write(" ")
-        arquivo.write("\n")
-    
-    arquivo.write("\nCaminho: " + str(caminho))
-    
-    arquivo.close()
 
 # Começa o programa
 if __name__ == '__main__':
@@ -251,7 +241,10 @@ if __name__ == '__main__':
     # Aonde o personagem começa
     luffy = personagem.posicaoX, personagem.posicaoY
     one_piece = tesouro.posicaoX, tesouro.posicaoY
+    
+    luffy_inicial = luffy
 
+    # Verifica se o tesouro foi aleatorizado em cima do personagem
     if(luffy == one_piece):
         print('O One Piece estava do seu lado o tempo todo')
         exit() # Sai direto do programa
@@ -270,12 +263,8 @@ if __name__ == '__main__':
             if (fila_posicoes == []):
                 break
             
-            if(verificaObstrucao(fila_valores) == True):
-                print('Luffy se perdeu e não achou os Road Poneglyph!!!')
-                exit()
-            
             # Primeiro print, aonde o luffy começara e aonde o one piece está
-            printaTerminal(iteracao, personagem.posicaoX, personagem.posicaoY, tesouro.posicaoX, tesouro.posicaoY, fila_valores, fila_posicoes, matriz, matriz_cenario)
+            printaTerminal(iteracao, luffy_inicial, one_piece, personagem.posicaoX, personagem.posicaoY, fila_valores, fila_posicoes, matriz, matriz_cenario)
             
             # Adiciona o caminho percorrido
             caminho.append(luffy)
@@ -291,19 +280,18 @@ if __name__ == '__main__':
             # Move o personagem para a nova posição
             matriz_cenario[personagem.posicaoX, personagem.posicaoY] = 15
             
+            if(verificaObstrucao(fila_valores) == True):
+                print('Luffy se perdeu e não achou os Road Poneglyph!!!')
+                printaTerminal(iteracao, luffy_inicial, one_piece, personagem.posicaoX, personagem.posicaoY, fila_valores, fila_posicoes, matriz, matriz_cenario)
+                exit()
+            
             # Zera as filas para não ter lixo no buffer
             fila_posicoes.clear()
             fila_valores.clear()
             
-            
     if(luffy == one_piece):
         # Adiciona um novo valor apenas se o one piece for encontrado, para diferenciar apenas
         matriz_cenario[tesouro.posicaoX, tesouro.posicaoY] = 1000
-        
         print("\n\nO luffy finalmente encontrou o One Piece, seu caminho foi esse: ", caminho)
+        printaTerminal(iteracao, luffy_inicial, one_piece, personagem.posicaoX, personagem.posicaoY, fila_valores, fila_posicoes, matriz, matriz_cenario)
         
-        printaTerminal(iteracao, personagem.posicaoX, personagem.posicaoY, tesouro.posicaoX, tesouro.posicaoY, fila_valores, fila_posicoes, matriz, matriz_cenario)
-        
-    escreveArquivo(x, y, matriz, matriz_cenario, caminho, personagem.posicaoX, personagem.posicaoY, tesouro.posicaoX, tesouro.posicaoY)
-        
-     
