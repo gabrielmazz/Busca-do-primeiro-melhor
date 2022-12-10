@@ -10,7 +10,7 @@
 
 O programa consiste em criar um algoritmo de Inteligência Artificial usando o método da Busca pelo Primeiro Melhor ou Best-First Search (BFS)
 
-- Linguagem utilizado: *Python*
+- Linguagem utilizada: *Python*
 
 ### *Peculiaridades do método:*
 - O método A* é derivado deste
