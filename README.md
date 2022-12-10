@@ -12,8 +12,6 @@ O programa consiste em criar um algoritmo de Inteligência Artificial usando o m
 
 - Linguagem utilizado: *Python*
 
-<br>
-
 ### *Peculiaridades do método:*
 - O método A* é derivado deste
 - Parecido com a Subida da Encosta
@@ -49,7 +47,6 @@ while(true)
 
 - ![grid](grid.png)
 
-<br>
 
 ## **Execução:**
 
